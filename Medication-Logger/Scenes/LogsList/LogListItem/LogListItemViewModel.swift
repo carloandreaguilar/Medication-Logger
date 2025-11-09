@@ -9,14 +9,19 @@ import Foundation
 
 protocol LogListItemViewModel {
     var log: MedicationLog { get }
-    func dayLabel(for date: Date) -> String
+    var dayLabel: String { get }
 }
 
 struct DefaultLogListItemViewModel: LogListItemViewModel {
     let log: MedicationLog
-    let dayLabelFormatter: DayLabelFormatter
+    private let dayLabelFormatter: DayLabelFormatter
     
-    func dayLabel(for date: Date) -> String {
-        dayLabelFormatter.dayLabel(for: date, withFormat: .monthDayAbbreviated)
+    init(log: MedicationLog, dayLabelFormatter: DayLabelFormatter) {
+        self.log = log
+        self.dayLabelFormatter = dayLabelFormatter
+    }
+    
+    var dayLabel: String {
+        dayLabelFormatter.dayLabel(for: log.timestamp, withFormat: .monthDayAbbreviated)
     }
 }

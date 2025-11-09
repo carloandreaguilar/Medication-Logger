@@ -9,19 +9,25 @@ import Foundation
 
 protocol LogDetailViewModel {
     var log: MedicationLog { get }
-    var formattedDate: String { get }
+    var dayLabel: String { get }
 }
 
 struct DefaultLogDetailViewModel: LogDetailViewModel {
-    var log: MedicationLog
-    private let formatter = DateFormatter()
+    let log: MedicationLog
+    private let dayLabelFormatter: DayLabelFormatter
+    private let timeFormatter: DateFormatter = .withFormat(.hourMinute)
     
-    init(log: MedicationLog) {
+    init(log: MedicationLog, dayLabelFormatter: DayLabelFormatter) {
         self.log = log
-        self.formatter.dateFormat = "MMMM d yyyy 'at' h:mma"
+        self.dayLabelFormatter = dayLabelFormatter
     }
     
-    var formattedDate: String {
-        return formatter.string(from: log.timestamp)
+    private var time: String {
+        return timeFormatter.string(from: log.timestamp)
+    }
+    
+    var dayLabel: String {
+        let day = dayLabelFormatter.dayLabel(for: log.timestamp, withFormat: .monthDay)
+        return "\(day) at \(time)"
     }
 }

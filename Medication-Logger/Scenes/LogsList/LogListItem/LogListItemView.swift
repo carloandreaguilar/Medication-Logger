@@ -21,7 +21,7 @@ struct LogListItemView: View {
             }
             Spacer()
             VStack(alignment: .trailing) {
-                Text(viewModel.dayLabel(for: viewModel.log.timestamp))
+                Text(viewModel.dayLabel)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                 Text(viewModel.log.timestamp, style: .time)

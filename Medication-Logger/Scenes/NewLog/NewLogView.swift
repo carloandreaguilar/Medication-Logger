@@ -33,13 +33,10 @@ struct NewLogView: View {
                 }
                 
                 Section("Time Taken") {
-                    HStack {
-                        Text(viewModel.useCurrentTime ? "Current time:" : "Custom time:")
-                            .foregroundStyle(.secondary)
+                    HStack(alignment: .center) {
                         if viewModel.useCurrentTime {
                             HStack {
-                                
-                                Text(viewModel.timeTaken, style: .time)
+                                Text(viewModel.currentDateFormatted)
                                 Spacer()
                                 Button("Change") {
                                     viewModel.useCurrentTime = false
@@ -49,13 +46,11 @@ struct NewLogView: View {
                             DatePicker(
                                 "",
                                 selection: $viewModel.timeTaken,
-                                in: ...Date(),
+                                in: ...viewModel.currentTime,
                                 displayedComponents: [.date, .hourAndMinute])
+                            .labelsHidden()
                         }
-                        Spacer()
-                        
                     }
-                    .fixedSize(horizontal: false, vertical: true)
                 }
                 Section("Notes") {
                     TextEditor(text: $viewModel.notes)
@@ -85,7 +80,9 @@ struct NewLogView: View {
         }
     }
 }
-//
-//#Preview {
-//    NewLogView(medicationNames: ["Ibuprofen", "Methotrexate", "Prednisone"])
-//}
+
+#Preview {
+    let container = try! ModelContainer(for: MedicationLog.self, configurations: .init(isStoredInMemoryOnly: true))
+    let context = container.mainContext
+    NewLogView(viewModel: DefaultNewLogViewModel(modelContext: context, medicationNames: ["Ibuprofen", "Methotrexate", "Prednisone"]))
+}

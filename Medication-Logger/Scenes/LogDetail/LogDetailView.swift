@@ -21,7 +21,7 @@ struct LogDetailView: View {
                     Text(viewModel.log.dosage)
                 }
                 Section("Time taken") {
-                    Text(viewModel.formattedDate)
+                    Text(viewModel.dayLabel)
                 }
                 if let notes = viewModel.log.notes {
                     Section("Notes") {
@@ -37,5 +37,5 @@ struct LogDetailView: View {
 }
 
 #Preview {
-    LogDetailView(viewModel: DefaultLogDetailViewModel(log: .example))
+    LogDetailView(viewModel: DefaultLogDetailViewModel(log: .example, dayLabelFormatter: DefaultDayLabelFormatter()))
 }

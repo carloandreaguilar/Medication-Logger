@@ -18,6 +18,7 @@ protocol AppDependencies {
 
 struct DefaultAppDependencies: AppDependencies {
     let modelContainer: ModelContainer
+    let dayLabelFormatter = DefaultDayLabelFormatter()
     
     init() {
         self.modelContainer = {
@@ -35,15 +36,15 @@ struct DefaultAppDependencies: AppDependencies {
     }
     
     func makeLogsListViewModel() -> any LogsListViewModel {
-        DefaultLogsListViewModel(modelContext: modelContainer.mainContext, daylabelFormatter: DefaultDayLabelFormatter())
+        DefaultLogsListViewModel(modelContext: modelContainer.mainContext, daylabelFormatter: dayLabelFormatter)
     }
     
     func makeLogListItemViewModel(log: MedicationLog) -> LogListItemViewModel {
-        DefaultLogListItemViewModel(log: log, dayLabelFormatter: DefaultDayLabelFormatter())
+        DefaultLogListItemViewModel(log: log, dayLabelFormatter: dayLabelFormatter)
     }
     
     func makeLogDetailViewModel(log: MedicationLog) -> any LogDetailViewModel {
-        DefaultLogDetailViewModel(log: log)
+        DefaultLogDetailViewModel(log: log, dayLabelFormatter: dayLabelFormatter)
     }
     
     func makeNewLogViewModel() -> NewLogViewModel {

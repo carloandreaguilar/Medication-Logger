@@ -20,6 +20,7 @@ protocol NewLogViewModel {
     var notes: String { get set }
     var useCurrentTime: Bool { get set }
     var isMissingRequiredFields: Bool { get }
+    var currentDateFormatted: String { get }
     func saveLog() throws
 }
 
@@ -37,6 +38,8 @@ class DefaultNewLogViewModel: NewLogViewModel {
     var useCurrentTime = true
     private var timerCancellable: AnyCancellable?
     
+    private let timeFormatter: DateFormatter = .withFormat(.hourMinute)
+    
     init(modelContext: ModelContext, medicationNames: [String]) {
         self.modelContext = modelContext
         self.medicationNames = medicationNames
@@ -47,14 +50,19 @@ class DefaultNewLogViewModel: NewLogViewModel {
             .autoconnect()
             .sink { [weak self] now in
                 guard let self else { return }
+                self.currentTime = .now
                 if self.useCurrentTime {
-                    self.timeTaken = .now
+                    self.timeTaken = currentTime
                 }
             }
     }
     
     var isMissingRequiredFields: Bool {
         selectedMedication == nil || dosage.isEmpty
+    }
+    
+    var currentDateFormatted: String {
+        "Today at \(timeFormatter.string(from: currentTime))"
     }
     
     func saveLog() throws {
