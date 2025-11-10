@@ -19,24 +19,11 @@ struct LogsListView: View {
     
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
                 if logs.isEmpty {
                     ContentUnavailableView("None yet", systemImage: "tray.fill")
                 } else {
-                    List {
-                        ForEach(logsGroupedByDay, id: \.day) { day, logs in
-                            Section(viewModel.dayLabel(for: day)) {
-                                ForEach(logs, id: \.id) { log in
-                                    NavigationLink {
-                                        LogDetailView(viewModel: appDependencies.makeLogDetailViewModel(log: log))
-                                    } label: {
-                                        LogListItemView(viewModel: appDependencies.makeLogListItemViewModel(log: log))
-                                    }
-                                }
-                            }
-                        }
-                        .onDelete(perform: deleteLogs)
-                    }
+                    logsList
                 }
             }
             .toolbar {
@@ -56,22 +43,38 @@ struct LogsListView: View {
         }
     }
     
+    var logsList: some View {
+        List {
+            ForEach(logsGroupedByDay, id: \.day) { day, logs in
+                Section(viewModel.dayLabel(for: day)) {
+                    ForEach(logs, id: \.id) { log in
+                        NavigationLink {
+                            LogDetailView(viewModel: appDependencies.makeLogDetailViewModel(log: log))
+                        } label: {
+                            LogListItemView(viewModel: appDependencies.makeLogListItemViewModel(log: log))
+                        }
+                    }
+                    .onDelete { offsets in
+                        let logsToDelete = offsets.map { offset in
+                            logs[offset]
+                        }
+                        withAnimation {
+                            viewModel.deleteLogs(logsToDelete)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     var logsGroupedByDay: [(day: Date, logs: [MedicationLog])] {
         let groupedByDay = Dictionary(grouping: logs) { log in
             Calendar.current.startOfDay(for: log.timestamp)
         }
         return groupedByDay
-            .map { (day: $0.key, logs: $0.value) }
+            .map { (day: $0.key,
+                    logs: $0.value.sorted { $0.timestamp > $1.timestamp }) }
             .sorted { $0.day > $1.day }
-    }
-    
-    private func deleteLogs(offsets: IndexSet) {
-        let logsToDelete = offsets.map { offset in
-            logs[offset]
-        }
-        withAnimation {
-            viewModel.deleteLogs(logsToDelete)
-        }
     }
 }
 
